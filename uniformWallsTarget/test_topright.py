@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 def test(seed=None):
     # Create environment
     env = MazeEnv(seed=seed)
-    model = PPO.load("ppo_maze")
+    model = PPO.load("topright_maze")
 
     obs = env.reset()
     done = False

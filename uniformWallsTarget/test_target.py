@@ -2,11 +2,20 @@ import sys
 from stable_baselines3 import PPO
 from maze_env import MazeEnv
 import matplotlib.pyplot as plt
+import numpy as np
 
 def test(seed=None):
     # Create environment
-    env = MazeEnv(seed=seed)
-    model = PPO.load("ppo_maze")
+    env = MazeEnv()
+    env.seed(seed)
+    maze = env._generate_maze()
+    # Find all the empty positions (not walls)
+    valid_positions = np.argwhere(maze == 0)
+    # Randomly choose one of the valid positions as the target
+    target_position = tuple(valid_positions[np.random.choice(len(valid_positions))])
+
+    env = MazeEnv(seed=seed, target_pos=target_position)
+    model = PPO.load("target_maze")
 
     obs = env.reset()
     done = False

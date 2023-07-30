@@ -12,5 +12,5 @@ vec_env = make_vec_env(lambda: env, n_envs=1, seed=seed)
 
 # Train model
 model = PPO("MlpPolicy", vec_env, verbose=1)
-model.learn(total_timesteps=60000)
-model.save("ppo_maze")
+model.learn(total_timesteps=60)
+model.save("topright_maze")
