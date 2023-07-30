@@ -4,12 +4,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class MazeEnv(gym.Env):
-    def __init__(self, size=9, seed=None, target_pos=None):
+    def __init__(self, size=7, seed=None, target_type=None):
         super(MazeEnv, self).__init__()
         self.size = size | 1  # Ensure odd size
         self.action_space = spaces.Discrete(4)
         self.observation_space = spaces.Box(low=0, high=2, shape=(size, size), dtype=int)
-        self.target_pos = target_pos  # Store target_pos
+        self.target_type = target_type  # Store target_pos
+        self.target_pos = None
         self.seed(seed)
         self.reset()
 
@@ -41,15 +42,13 @@ class MazeEnv(gym.Env):
         self._recursive_backtracking(x, y, maze)
 
         self.agent_pos = (self.np_random.integers(1, self.size-1), 0)
-        # self.target_pos = self.np_random.choice(np.argwhere(maze == 0))
-        # maze[self.target_pos[0]][self.target_pos[1]] = 2
-
-        if self.target_pos is not None:  # Set target position if provided
-            self.target_pos = tuple(self.target_pos)
-        else:
+        # print(self.target_pos)
+        if isinstance(self.target_type, str) and self.target_type == 'topright':
             self.target_pos = (0, self.size-1)
             # Nullify the wall if it coincides with the target position
             maze[self.target_pos] = 0
+        else:
+            self.target_pos = self.np_random.choice(np.argwhere(maze == 0))
         
         maze[self.target_pos[0]][self.target_pos[1]] = 2
         return maze
@@ -59,15 +58,17 @@ class MazeEnv(gym.Env):
         self.agent_pos = (self.size-2, 0)
         self.maze[self.agent_pos] = 2
 
-        # Set target position if not provided during initialization
-        if self.target_pos is None:
+        if isinstance(self.target_type, str) and self.target_type == 'topright':
             self.target_pos = (0, self.size-1)
             # Nullify the wall if it coincides with the target position
             self.maze[self.target_pos] = 0
+        else:
+            self.target_pos = self.np_random.choice(np.argwhere(self.maze == 0))
 
         self.maze[self.target_pos[0]][self.target_pos[1]] = 2
         self.steps = 0
         return self.maze.copy()
+
 
     def step(self, action):
         x, y = self.agent_pos
